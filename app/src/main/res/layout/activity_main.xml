@@ -5,18 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorBlack"
     tools:context="com.example.pablo.appcompiler.MainActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorStrongGray"
+        android:gravity="center"
         android:text="Herramientas de compilador"
-        android:textSize="28dp"
-        android:gravity="center"/>
+        android:textColor="@color/colorWhite"
+        android:textSize="28dp" />
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_development"
+        android:background="@color/colorWhite"/>
 
     <Button
         android:layout_width="match_parent"
@@ -37,5 +42,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Definiciones de lenguaje" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Depuracion" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Opciones" />
 
 </android.support.v7.widget.LinearLayoutCompat>

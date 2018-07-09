@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    >
+
+    <EditText
+        android:id="@+id/editCod"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/colorWhite"
+        android:layout_width="match_parent"
+        android:layout_height="370dp"
+        android:layout_marginTop="30dp"
+        android:gravity="top"
+        android:ems="14"
+        android:inputType="textMultiLine"
+        />
+
+    <Button
+        android:id="@+id/btnCompilar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Compilar"
+        />
+</LinearLayout>

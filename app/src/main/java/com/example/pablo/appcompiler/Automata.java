@@ -3,19 +3,25 @@ package com.example.pablo.appcompiler;
 /**
  * Created by pablo on 5/07/18.
  */
-
+//Establece el esqueleto de un autómata en base a los nodos y arcos
 public class Automata {
     Nodo initNode;
     Nodo[] states;
     Arco[] transitions;
     String componenteLexico;
 
-
+    /**
+     * Constructor que permite crear un autómata en base a una cadena de
+     * entrada, no crea relaciones, solo crea todos los objetos de tipo
+     * nodo y arco que lo conforman. Estos se guardan en los arreglos:
+     * states y transitions.
+     * @return El autómata
+     */
     public Automata(String automataData){
         String[] automataStatesTransitions=automataData.split("-");
         componenteLexico="No definido";
         /*System.out.println("------------------------CREATE AUTOMATA------------------------------");
-
+            ----CODIGO DE PRUEBA PARA VERIFICAR UN ERROR, YA HA SIDO CORREGIDO-----
         System.out.println("automataData= "+automataData);
         System.out.println("automataStatesTransitions[0]= "+automataStatesTransitions[0]);
         System.out.println("automataStatesTransitions[1]= "+automataStatesTransitions[1]);*/
@@ -32,6 +38,7 @@ public class Automata {
         for(int i=0;i<automataTransitions.length;i++){
             System.out.println("automataTransitions["+i+"]= "+automataTransitions[i]);
         }
+        ----CODIGO DE PRUEBA PARA VERIFICAR UN ERROR, YA HA SIDO CORREGIDO-----
         System.out.println("-----------------------------------------------");
         System.out.println("\n\n\n");*/
         Nodo[] newStates= new Nodo[automataStates.length];
@@ -66,7 +73,7 @@ public class Automata {
     public void linkNode(Nodo sourceNode,Arco sourceArc,Nodo destinationNode){
         sourceNode.createNextArco(sourceArc);
         sourceArc.createNextNodo(destinationNode);
-        //sourceNode.nextArco=sourceArc;
+        //sourceNode.nextArco=sourceArc; CODIGO VIEJO ANTES DE CAMBIO DE INGENIERÍA
         //sourceArc.nextNodo=destinationNode;
     }
 
@@ -86,8 +93,8 @@ public class Automata {
     }
 
     /**
-     * Método que permite imprimir el contenido de un Automata
-     * @return Impresión del automata
+     * Método que permite imprimir el contenido de un Automata en consola
+     * @return Impresión del automata en consola
      */
     public void printAutomata(){
 

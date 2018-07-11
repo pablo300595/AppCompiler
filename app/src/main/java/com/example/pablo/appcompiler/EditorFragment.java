@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+//Define las acciones del fragment de editor de código
 public class EditorFragment extends Fragment{
     Button btnCompilar;
     EditText editCod;
@@ -23,8 +23,8 @@ public class EditorFragment extends Fragment{
         btnCompilar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            //Evento de click a compilar que manda a procesar el texto escrito
             analizadorLexico=new AnalisisLexico(editCod.getText().toString());
-
             analizadorLexico.validateLexemas();
             analizadorLexico.printValidTokens();
             }

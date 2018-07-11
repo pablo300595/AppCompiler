@@ -5,8 +5,9 @@ import android.provider.FontRequest;
 /**
  * Created by pablo on 5/07/18.
  */
-
+//Clase que permite definir los autómatas del lenguaje
 public class CreadorAutomatas {
+    //Definición de autómatas
     static Automata keyword[];
     static Automata opAsignation[];
     static Automata opLogic[];
@@ -16,6 +17,7 @@ public class CreadorAutomatas {
     static Automata symbols[];
     static Automata digits[];
     static Automata AB;
+    //Cadenas a procesar para ser convertidas a Autómatas.
     //KEYWORDS
     static String expTask="q0,q1,q2,q3,q4 sql-t,a,s,k";
     static String expMetadata= "q0,q1,q2,q3,q4,q5,q6,q7,q8 sql-m,e,t,a,d,a,t,a";
@@ -68,6 +70,12 @@ public class CreadorAutomatas {
 
     static String expAB="q0,q1 sql,q2 sql,q3 sql-a,b";
 
+    /**
+     * Constructor que permite inicializar el tamaño de los arreglos de autómatas
+     * (Palabras reservadas, Operadores y simbolos). También manda a llamar el
+     * método que crea todos los autómatas.
+     * @return nada
+     */
     public CreadorAutomatas(){
         keyword=new Automata[16];
         opLogic=new Automata[3];
@@ -75,7 +83,10 @@ public class CreadorAutomatas {
         digits=new Automata[10];
         createAllAutomatas();
     }
-
+    /**
+     * Método que permite definir la estructura y enlaces de los autómatas
+     * @return El puntero del arco
+     */
     public void createAllAutomatas(){
         //KEYWORD task
         keyword[0]=new Automata(expTask);

@@ -8,10 +8,12 @@ public class Automata {
     Nodo initNode;
     Nodo[] states;
     Arco[] transitions;
+    String componenteLexico;
 
 
     public Automata(String automataData){
         String[] automataStatesTransitions=automataData.split("-");
+        componenteLexico="No definido";
         /*System.out.println("------------------------CREATE AUTOMATA------------------------------");
 
         System.out.println("automataData= "+automataData);
@@ -62,8 +64,10 @@ public class Automata {
      * @return Nada
      */
     public void linkNode(Nodo sourceNode,Arco sourceArc,Nodo destinationNode){
-        sourceNode.nextArco=sourceArc;
-        sourceArc.nextNodo=destinationNode;
+        sourceNode.createNextArco(sourceArc);
+        sourceArc.createNextNodo(destinationNode);
+        //sourceNode.nextArco=sourceArc;
+        //sourceArc.nextNodo=destinationNode;
     }
 
     /**
@@ -81,34 +85,21 @@ public class Automata {
         return new Arco(letter);
     }
 
+    /**
+     * Método que permite imprimir el contenido de un Automata
+     * @return Impresión del automata
+     */
     public void printAutomata(){
-        for(Nodo apuntador=this.states[0];apuntador.nextArco!=null;apuntador=apuntador.nextArco.nextNodo){
-            System.out.println("----------------------------------------------------------------");
-            System.out.println("State= "+apuntador.state);
-            System.out.println("Next Transition= "+apuntador.nextArco.letter);
-            System.out.println("isFinalState? "+apuntador.isFinalState);
-            System.out.println("isInitState? "+apuntador.isInitState);
+
+        for(int i=0;i<states.length;i++){
+            System.out.println("------------------------------------------------------");
+            System.out.println("State=> "+states[i].state);
+            System.out.println("init?=> "+states[i].isInitState);
+            System.out.println("final?=> "+states[i].isFinalState);
+            for(int j=0;j<states[i].nextArco.size();j++){
+                System.out.println("transition=> "+states[i].nextArco.get(j).letter);
+            }
+            System.out.println("------------------------------------------------------");
         }
-    }
-
-    public static void main(String ar[]){
-        //Automata keywordTask=new Automata();
-
-        /*Nodo q0=keywordTask.createNode("q0",true,false);
-        Nodo q1=keywordTask.createNode("q1",false,false);
-        Nodo q2=keywordTask.createNode("q2",false,false);
-        Nodo q3=keywordTask.createNode("q3",false,true);
-        Nodo q4=keywordTask.createNode("q4",false,true);
-        Arco t0=keywordTask.createArc("n");
-        Arco a0=keywordTask.createArc("e");
-        Arco s0=keywordTask.createArc("w");
-        Arco k0=keywordTask.createArc("k");
-        initNode=q0;
-        keywordTask.linkNode(q0, t0, q1);
-        keywordTask.linkNode(q1, a0, q2);
-        keywordTask.linkNode(q2, s0, q3);
-        keywordTask.linkNode(q3, k0, q4);
-        printAutomata(initNode);*/
-
     }
 }

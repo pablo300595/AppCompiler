@@ -87,4 +87,21 @@ public class AnalisisSemantico {
         }
         return false;
     }
+
+    /**
+     * Método que permite obtener la lista de tokens de error
+     * @return tokens
+     */
+    public String createErrorList(){
+        String tokenInfo="";
+
+        for(int i=0;i<errorList.size();i++){
+            tokenInfo+=errorList.get(i)[0]+"\n";
+            tokenInfo+=errorList.get(i)[1]+"\n";
+            tokenInfo+=errorList.get(i)[2]+"\n";
+            tokenInfo+=errorList.get(i)[3]+"\n";
+            tokenInfo+="___________________________"+"\n";
+        }
+        return tokenInfo;
+    }
 }

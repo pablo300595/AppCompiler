@@ -29,11 +29,12 @@ public class EditorFragment extends Fragment{
             //Evento de click a compilar que manda a procesar el texto escrito
             analizadorLexico=new AnalisisLexico(editCod.getText().toString());
             analizadorLexico.generateTokens();
+            analizadorLexico.createErrorList();
             tokenList=analizadorLexico.printValidTokens();
-            errorList=analizadorLexico.createErrorList();
             validTokenList=analizadorLexico.createValidTokenList();
             analizadorSintactico=new AnalisisSintactico(analizadorLexico.validTokenList,analizadorLexico.automatas,analizadorLexico.errorList);
             analizadorSemantico=new AnalisisSemantico(analizadorSintactico.errorList,analizadorSintactico.sentencias,analizadorSintactico.inicializaciones,analizadorSintactico.automatas);
+            errorList=analizadorSemantico.createErrorList();
             SalidaFragment.tvTokens.setText(tokenList);
             SalidaFragment.tvErrors.setText(errorList);
             //System.out.println("_____________________________________________________________");

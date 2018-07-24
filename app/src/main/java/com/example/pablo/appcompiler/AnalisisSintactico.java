@@ -20,7 +20,11 @@ public class AnalisisSintactico {
         this.automatas=automatas;
         validateProductionTask();
     }
-
+    /**
+     * Metodo que permite analizar los tokens generados
+     * en la etapa anterior, se realiza en base a un autómata
+     *
+     */
     public void validateProductionTask(){
         boolean isValid=false;
         String error[];
@@ -28,7 +32,7 @@ public class AnalisisSintactico {
         for(int i=0;i<tokenList.size();i++){
             for(int k=0;k<j.nextArco.size();k++){
                 if(j.state.equals("q5")){
-                    validateProductionCodeBlock(j,i);
+                    i=(validateProductionCodeBlock(j,i)-1);
                     j=j.nextArco.get(k).nextNodo.get(0);
                     i++;
                 }
@@ -69,7 +73,7 @@ public class AnalisisSintactico {
 
     public int validateProductionCodeBlock(Nodo j,int index){
         boolean foundValidSequence=false;
-        int lastPosition=index;
+        int lastLineAnalyzed=1;
         String sentencia="";
         String id="\\_([a-zA-Z0-9])+";
         String num="(([0-9])+.([0-9])+)|([0-9])+";
@@ -87,12 +91,26 @@ public class AnalisisSintactico {
         for(;index<tokenList.size();index++){
             sentencia+=tokenList.get(index)[0]+" ";
             cantOprSentencia++;
-            if(tokenList.get(index).equals("\\}")&& index==tokenList.size()-1){
-                if(!foundAtLeastOne){
-                    error=("Elemento no definido "+"-Numero de linea"+tokenList.get(index)[1]+"-Error Sintactico-Id ES000003: Secuencia bloque irreparable").split("-");
-                    errorList.add(error);
+
+            if(foundAtLeastOne){
+                lastLineAnalyzed=Integer.parseInt(tokenList.get(index)[1]);
+                if(!(tokenList.get(index)[0].equals("}") && index==tokenList.size()-1)){
+                    foundAtLeastOne=false;
                 }
-                break;
+            }
+
+            if(tokenList.get(index)[0].equals("}")){
+                if(index==tokenList.size()-1){
+                    if(!foundAtLeastOne){
+                        error=("Error de secuencia a partir de "+tokenList.get(posicionarIndiceTokenAultimaLinea(lastLineAnalyzed))[0]+"-|Numero de linea "+tokenList.get(posicionarIndiceTokenAultimaLinea(lastLineAnalyzed))[1]+"-|Error Sintactico-|Id ES000003: Secuencia bloque sentencial").split("-");
+                        errorList.add(error);
+                        index=posicionarIndiceTokenAultimaLinea(lastLineAnalyzed)+1;
+                        cantOprSentencia=0;
+                        sentencia="";
+                        break;
+                    }
+                    break;
+                }
             }
             if(cantOprSentencia==3){
                 if(Pattern.compile(asignacion1).matcher(sentencia).matches()){
@@ -101,6 +119,8 @@ public class AnalisisSintactico {
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
+                }else{
+                    foundAtLeastOne=false;
                 }
             }
             if(cantOprSentencia==4){
@@ -111,19 +131,21 @@ public class AnalisisSintactico {
                     sentencia="";
                     foundAtLeastOne=true;
                 }
-                if(Pattern.compile(asignacion1).matcher(sentencia).matches()){
+                else if(Pattern.compile(asignacion1).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@asignacion ").split("@");
                     sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
                 }
-                if(Pattern.compile(asignacion2).matcher(sentencia).matches()){
+                else if(Pattern.compile(asignacion2).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@asignacion ").split("@");
                     sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
+                }else{
+                    foundAtLeastOne=false;
                 }
             }
             if(cantOprSentencia==5){
@@ -133,9 +155,10 @@ public class AnalisisSintactico {
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
+                }else{
+                    foundAtLeastOne=false;
                 }
             }
-
         }
         return index;
     }
@@ -152,5 +175,18 @@ public class AnalisisSintactico {
             pos=0;
         }
         return pos;
+    }
+
+    public int posicionarIndiceTokenAultimaLinea(int pos){
+        int indice=0;
+        String posicion=pos+"";
+
+        for(int i=0;i<tokenList.size();i++){
+            if(tokenList.get(i)[1].equals(posicion)){
+                indice=i;
+                break;
+            }
+        }
+        return indice;
     }
 }

@@ -29,6 +29,7 @@ public class EditorActivity extends AppCompatActivity {
         pa.addFragment(new SalidaFragment(),"Salida");
         pa.addFragment(new SimbolosFragment(),"Tabla de símbolos");
         pa.addFragment(new GeneralesFragment(),"Generales");
+        pa.addFragment(new ExtrasFragment(),"Extras");
         vwpager.setAdapter(pa);
     }
 }

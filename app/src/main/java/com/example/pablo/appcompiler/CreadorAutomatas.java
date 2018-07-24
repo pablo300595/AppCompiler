@@ -17,6 +17,9 @@ public class CreadorAutomatas {
     static Automata symbols[];
     static Automata digits[];
     static Automata AB;
+    static Automata bloqueTask;
+    static Automata number;
+    static Automata string;
     //Cadenas a procesar para ser convertidas a Autómatas.
     //KEYWORDS
     static String expTask="q0,q1,q2,q3,q4 sql-t,a,s,k";
@@ -41,21 +44,27 @@ public class CreadorAutomatas {
 
 
     static String expNot="q0,q1 sql-!";
-    static String expOr="q0,q1,q2 sql-|,|";
-    static String expAnd="q0,q1,q2 sql-&,&";
+    static String expOr="q0,q1 sql-|";
+    static String expAnd="q0,q1 sql-&";
 
-    static String expLessThan="q0,q1 sql-<";
+    static String expPlus="q0,q1 sql-+";
+    static String expMinus="q0,q1 sql-;";
+    static String expTimes="q0,q1 sql-*";
+    static String expDividedBy="q0,q1 sql-/";
+
+    static String expLessThan="q0,q1,q2 sql-<,<";
     static String expLessEqualThan="q0,q1,q2 sql-<,=";
-    static String expMoreThan="q0,q1 sql->";
+    static String expMoreThan="q0,q1,q2 sql->,>";
     static String expMoreEqualThan="q0,q1,q2 sql->,=";
     static String expEqual="q0,q1,q2 sql-=,=";
-    static String expDifferent="q0,q1,q2 sql-!,=";
+    static String expDifferent="q0,q1,q2 sql-¡,=";
 
     static String expDollar="q0,q1 sql-$";
     static String expOpenBrace="q0,q1 sql-{";
     static String expClosedBrace="q0,q1 sql-}";
     static String expOpenParenthesis="q0,q1 sql-(";
     static String expClosedParenthesis="q0,q1 sql-)";
+    static String expPercent="q0,q1 sql-%";
 
     static String exp0="q0,q1 sql-0";
     static String exp1="q0,q1 sql-1";
@@ -68,7 +77,22 @@ public class CreadorAutomatas {
     static String exp8="q0,q1 sql-8";
     static String exp9="q0,q1 sql-9";
 
-    static String expAB="q0,q1 sql,q2 sql,q3 sql-a,b";
+    static String expNumero="q0,q1 sql,q2,q3 sql-0,1,2,3,4,5,6,7,8,9,.";
+    static String expCadena="q0,q1,q2,q3 sql-',a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z" +
+            ",A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,L,S,T,U,V,W,X,Y,Z,0,1,2,3,4,5,6,7,8,9";
+            //0 -> '
+            //1-26-> minúsculas
+            //27-53-Mayúsculas
+            //54-63 digitos
+    static String expSegTask="q0:q1:q2:q3:q4:q5:q6:q7 sql:q8#" +
+                    "task:" +
+                    "none:" +
+                    "\\{:\\{:\\}:" +
+                    "\\" +"_([a-zA-Z0-9]){1,20}:"+
+                    "Parametros:" +
+                    "_BloqueCodigo:" +
+                    "task:" +
+                    "params";
 
     /**
      * Constructor que permite inicializar el tamaño de los arreglos de autómatas
@@ -79,9 +103,12 @@ public class CreadorAutomatas {
     public CreadorAutomatas(){
         keyword=new Automata[16];
         opLogic=new Automata[3];
-        symbols=new Automata[5];
+        opRelational=new Automata[6];
+        symbols=new Automata[6];
         digits=new Automata[10];
+        opArithmetic=new Automata[4];
         createAllAutomatas();
+        createAllGrammars();
     }
     /**
      * Método que permite definir la estructura y enlaces de los autómatas
@@ -189,7 +216,7 @@ public class CreadorAutomatas {
         keyword[9].initNode=keyword[9].states[0];
         keyword[9].componenteLexico="Palabra reservada";
         keyword[9].linkNode(keyword[9].states[0], keyword[9].transitions[0], keyword[9].states[1]);
-        keyword[9].linkNode(keyword[9].states[0], keyword[9].transitions[0], keyword[9].states[2]);
+        keyword[9].linkNode(keyword[9].states[1], keyword[9].transitions[1], keyword[9].states[2]);
 
         //KEYWORD none
         keyword[10]=new Automata(expNone);
@@ -333,13 +360,11 @@ public class CreadorAutomatas {
         opLogic[1].initNode=opLogic[1].states[0];
         opLogic[1].componenteLexico="Operador Lógico";
         opLogic[1].linkNode(opLogic[1].states[0], opLogic[1].transitions[0], opLogic[1].states[1]);
-        opLogic[1].linkNode(opLogic[1].states[1], opLogic[1].transitions[1], opLogic[1].states[2]);
             //and
         opLogic[2]=new Automata(expAnd);
         opLogic[2].initNode=opLogic[2].states[0];
         opLogic[2].componenteLexico="Operador Lógico";
         opLogic[2].linkNode(opLogic[2].states[0], opLogic[2].transitions[0], opLogic[2].states[1]);
-        opLogic[2].linkNode(opLogic[2].states[1], opLogic[2].transitions[1], opLogic[2].states[2]);
 
         //SYMBOLS
             //dollar
@@ -367,7 +392,32 @@ public class CreadorAutomatas {
         symbols[4].initNode=symbols[4].states[0];
         symbols[4].componenteLexico="Signo de agrupación";
         symbols[4].linkNode(symbols[4].states[0], symbols[4].transitions[0], symbols[4].states[1]);
+           //comma
+        symbols[5]=new Automata(expPercent);
+        symbols[5].initNode=symbols[5].states[0];
+        symbols[5].componenteLexico="Signo de agrupación";
+        symbols[5].linkNode(symbols[5].states[0], symbols[5].transitions[0], symbols[5].states[1]);
 
+        //Arithmetic Op
+        opArithmetic[0]=new Automata(expPlus);
+        opArithmetic[0].initNode=opArithmetic[0].states[0];
+        opArithmetic[0].componenteLexico="Operador Aritmetico";
+        opArithmetic[0].linkNode(opArithmetic[0].states[0], opArithmetic[0].transitions[0], opArithmetic[0].states[1]);
+
+        opArithmetic[1]=new Automata(expMinus);
+        opArithmetic[1].initNode=opArithmetic[1].states[0];
+        opArithmetic[1].componenteLexico="Operador Aritmetico";
+        opArithmetic[1].linkNode(opArithmetic[1].states[0], opArithmetic[1].transitions[0], opArithmetic[1].states[1]);
+
+        opArithmetic[2]=new Automata(expTimes);
+        opArithmetic[2].initNode=opArithmetic[2].states[0];
+        opArithmetic[2].componenteLexico="Operador Aritmetico";
+        opArithmetic[2].linkNode(opArithmetic[2].states[0], opArithmetic[2].transitions[0], opArithmetic[2].states[1]);
+
+        opArithmetic[3]=new Automata(expDividedBy);
+        opArithmetic[3].initNode=opArithmetic[3].states[0];
+        opArithmetic[3].componenteLexico="Operador Aritmetico";
+        opArithmetic[3].linkNode(opArithmetic[3].states[0], opArithmetic[3].transitions[0], opArithmetic[3].states[1]);
         //DIGITS
         digits[0]=new Automata(exp0);
         digits[0].initNode=digits[0].states[0];
@@ -418,7 +468,243 @@ public class CreadorAutomatas {
         digits[9].initNode=digits[9].states[0];
         digits[9].componenteLexico="Digito";
         digits[9].linkNode(digits[9].states[0], digits[9].transitions[0], digits[9].states[1]);
+        //NUMBER
+        number=new Automata(expNumero);
+        number.initNode=number.states[0];
+        number.componenteLexico="Numero";
+        number.linkNode(number.states[0],number.transitions[0],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[1],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[2],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[3],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[4],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[5],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[6],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[7],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[8],number.states[1]);
+        number.linkNode(number.states[0],number.transitions[9],number.states[1]);
 
+        number.linkNode(number.states[1],number.transitions[0],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[1],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[2],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[3],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[4],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[5],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[6],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[7],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[8],number.states[1]);
+        number.linkNode(number.states[1],number.transitions[9],number.states[1]);
+
+        number.linkNode(number.states[1],number.transitions[10],number.states[2]);
+
+        number.linkNode(number.states[2],number.transitions[0],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[1],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[2],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[3],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[4],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[5],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[6],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[7],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[8],number.states[3]);
+        number.linkNode(number.states[2],number.transitions[9],number.states[3]);
+
+        number.linkNode(number.states[3],number.transitions[0],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[1],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[2],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[3],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[4],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[5],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[6],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[7],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[8],number.states[3]);
+        number.linkNode(number.states[3],number.transitions[9],number.states[3]);
+        //STRING
+        string=new Automata(expCadena);
+        string.initNode=string.states[0];
+        string.componenteLexico="Cadena";
+        string.linkNode(string.states[0], string.transitions[0], string.states[1]);
+
+        string.linkNode(string.states[1], string.transitions[1], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[2], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[3], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[4], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[5], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[6], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[7], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[8], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[9], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[10], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[11], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[12], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[13], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[14], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[15], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[16], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[17], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[18], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[19], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[20], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[21], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[22], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[23], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[24], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[25], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[26], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[27], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[28], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[29], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[30], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[31], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[32], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[33], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[34], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[35], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[36], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[37], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[38], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[39], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[40], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[41], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[42], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[43], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[44], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[45], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[46], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[47], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[48], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[49], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[50], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[51], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[52], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[53], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[54], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[55], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[56], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[57], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[58], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[59], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[60], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[61], string.states[2]);
+        string.linkNode(string.states[1], string.transitions[62], string.states[2]);
+        //Return to state-----------------------------------------------------------
+        string.linkNode(string.states[2], string.transitions[1], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[2], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[3], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[4], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[5], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[6], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[7], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[8], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[9], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[10], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[11], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[12], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[13], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[14], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[15], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[16], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[17], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[18], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[19], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[20], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[21], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[22], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[23], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[24], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[25], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[26], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[27], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[28], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[29], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[30], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[31], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[32], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[33], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[34], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[35], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[36], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[37], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[38], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[39], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[40], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[41], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[42], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[43], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[44], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[45], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[46], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[47], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[48], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[49], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[50], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[51], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[52], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[53], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[54], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[55], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[56], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[57], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[58], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[59], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[60], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[61], string.states[2]);
+        string.linkNode(string.states[2], string.transitions[62], string.states[2]);
+
+        string.linkNode(string.states[2], string.transitions[0], string.states[3]);
+        string.linkNode(string.states[3], string.transitions[1], string.states[3]);
+        //Relacional
+        //Less Than
+        opRelational[0]=new Automata(expLessThan);
+        opRelational[0].initNode=opRelational[0].states[0];
+        opRelational[0].componenteLexico="Menor que";
+        opRelational[0].linkNode(opRelational[0].states[0], opRelational[0].transitions[0], opRelational[0].states[1]);
+        opRelational[0].linkNode(opRelational[0].states[1], opRelational[0].transitions[1], opRelational[0].states[2]);
+        //Less equal than
+        opRelational[1]=new Automata(expLessEqualThan);
+        opRelational[1].initNode=opRelational[1].states[0];
+        opRelational[1].componenteLexico="Menor igual que";
+        opRelational[1].linkNode(opRelational[1].states[0], opRelational[1].transitions[0], opRelational[1].states[1]);
+        opRelational[1].linkNode(opRelational[1].states[1], opRelational[1].transitions[1], opRelational[1].states[2]);
+        //More than
+        opRelational[2]=new Automata(expMoreThan);
+        opRelational[2].initNode=opRelational[2].states[0];
+        opRelational[2].componenteLexico="Mayor que";
+        opRelational[2].linkNode(opRelational[2].states[0], opRelational[2].transitions[0], opRelational[2].states[1]);
+        opRelational[2].linkNode(opRelational[2].states[1], opRelational[2].transitions[1], opRelational[2].states[2]);
+        //More Equal than
+        opRelational[3]=new Automata(expMoreEqualThan);
+        opRelational[3].initNode=opRelational[3].states[0];
+        opRelational[3].componenteLexico="Mayor igual que";
+        opRelational[3].linkNode(opRelational[3].states[0], opRelational[3].transitions[0], opRelational[3].states[1]);
+        opRelational[3].linkNode(opRelational[3].states[1], opRelational[3].transitions[1], opRelational[3].states[2]);
+        //Equal
+        opRelational[4]=new Automata(expEqual);
+        opRelational[4].initNode=opRelational[4].states[0];
+        opRelational[4].componenteLexico="Igual/Asignacion";
+        opRelational[4].linkNode(opRelational[4].states[0], opRelational[4].transitions[0], opRelational[4].states[1]);
+        opRelational[4].linkNode(opRelational[4].states[1], opRelational[4].transitions[1], opRelational[4].states[2]);
+        //Different
+        opRelational[5]=new Automata(expDifferent);
+        opRelational[5].initNode=opRelational[5].states[0];
+        opRelational[5].componenteLexico="Diferente";
+        opRelational[5].linkNode(opRelational[5].states[0], opRelational[5].transitions[0], opRelational[5].states[1]);
+        opRelational[5].linkNode(opRelational[5].states[1], opRelational[5].transitions[1], opRelational[5].states[2]);
+    }
+
+    public void createAllGrammars(){
+        //GRAMMAR Task
+        bloqueTask=new Automata(expSegTask);
+        bloqueTask.initNode=bloqueTask.states[0];
+        bloqueTask.componenteLexico="BloqueTask";
+        bloqueTask.linkNode(bloqueTask.states[0],bloqueTask.transitions[0],bloqueTask.states[1]);
+        bloqueTask.linkNode(bloqueTask.states[1],bloqueTask.transitions[5],bloqueTask.states[2]);
+        bloqueTask.linkNode(bloqueTask.states[2],bloqueTask.transitions[9],bloqueTask.states[3]);
+        bloqueTask.linkNode(bloqueTask.states[3],bloqueTask.transitions[1],bloqueTask.states[4]);
+        bloqueTask.linkNode(bloqueTask.states[3],bloqueTask.transitions[6],bloqueTask.states[8]);
+        bloqueTask.linkNode(bloqueTask.states[4],bloqueTask.transitions[2],bloqueTask.states[5]);
+        bloqueTask.linkNode(bloqueTask.states[5],bloqueTask.transitions[7],bloqueTask.states[6]);
+        bloqueTask.linkNode(bloqueTask.states[6],bloqueTask.transitions[4],bloqueTask.states[7]);
+        bloqueTask.linkNode(bloqueTask.states[7],bloqueTask.transitions[8],bloqueTask.states[1]);
+        bloqueTask.linkNode(bloqueTask.states[8],bloqueTask.transitions[3],bloqueTask.states[5]);
     }
 
 }

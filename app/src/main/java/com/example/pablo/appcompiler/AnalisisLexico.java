@@ -1,6 +1,8 @@
 package com.example.pablo.appcompiler;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by pablo on 8/07/18.
@@ -8,9 +10,11 @@ import java.util.ArrayList;
 //Clase que permite validar un Código fuente a través de Autómatas
 public class AnalisisLexico {
     ArrayList sourceCode;
-    ArrayList tokenList;
+    String[] sourceCodeSeparatedInLines;
+    ArrayList <String[]> tokenList,errorList,validTokenList;
     CreadorAutomatas automatas;
-    String[] manejadorError;
+
+    String componenteLexico="";
     /**
      * Constructor que permite procesar un código fuente.
      * Primero quita metacaracteres inutiles (Como salto de línea).
@@ -20,11 +24,46 @@ public class AnalisisLexico {
     public AnalisisLexico(String preSourceCode){
         sourceCode=new ArrayList();
         tokenList=new ArrayList();
-        manejadorError=new String[5];manejadorError[0]="Error Léxico ";manejadorError[1]="ID: ";
-        manejadorError[2]="Descripción: ";manejadorError[3]="Linea: ";manejadorError[4]="Token: ";
-        manejadorError[5]="Columna: ";
+        errorList=new ArrayList();
+        validTokenList=new ArrayList();
+
+        //Mecanismo que asigna números de línea
+        //Se captura cada linea de código y se separan los pretokens
+        sourceCodeSeparatedInLines=preSourceCode.split("\n");
+        for(int i=0;i<sourceCodeSeparatedInLines.length;i++){
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\{"," \\{ ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\}"," \\} ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\+"," \\+ ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll(";"," ; ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll(","," , ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\*"," \\* ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\/"," \\/ ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\$"," \\$ ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\("," \\( ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\)"," \\) ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\&"," \\& ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\|"," \\| ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\!"," \\! ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\=" ,"\\= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\= \\=|\\=  \\=" ,"==");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\< \\=|\\<  \\=" ,"<=");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\> \\=|\\>  \\=" ,">=");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\=="," \\== ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\>="," \\<= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\<="," \\<= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\¡="," \\¡= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\>>"," \\>> ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\<<"," \\<< ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\+ \\+ |\\+  \\+","++ ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\; \\; |\\;  \\;",";; ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\+ \\= |\\+  \\=","+= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\; \\= |\\;  \\=",";= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\* \\= |\\*  \\=","*= ");
+            sourceCodeSeparatedInLines[i]=sourceCodeSeparatedInLines[i].replaceAll("\\/ \\= |\\/  \\=","/= ");
+
+        }
         //Mecanismo que separa los simbolos para poder procesarlos mediante el método split
-        preSourceCode=preSourceCode.replaceAll("\n","");
+        preSourceCode=preSourceCode.replaceAll("\n"," ");
         preSourceCode=preSourceCode.replaceAll("\\{"," \\{ ");
         preSourceCode=preSourceCode.replaceAll("\\}"," \\} ");
         preSourceCode=preSourceCode.replaceAll("\\+"," \\+ ");
@@ -34,7 +73,17 @@ public class AnalisisLexico {
         preSourceCode=preSourceCode.replaceAll("\\$"," \\$ ");
         preSourceCode=preSourceCode.replaceAll("\\("," \\( ");
         preSourceCode=preSourceCode.replaceAll("\\)"," \\) ");
-        preSourceCode=preSourceCode.replaceAll("\\="," \\= ");
+        preSourceCode=preSourceCode.replaceAll("\\&"," \\& ");
+        preSourceCode=preSourceCode.replaceAll("\\|"," \\| ");
+        preSourceCode=preSourceCode.replaceAll("\\!"," \\! ");
+        preSourceCode=preSourceCode.replaceAll("\\=="," \\== ");
+        preSourceCode=preSourceCode.replaceAll("\\<="," \\<= ");
+        preSourceCode=preSourceCode.replaceAll("\\>="," \\>= ");
+        preSourceCode=preSourceCode.replaceAll("\\¡="," \\¡= ");
+        preSourceCode=preSourceCode.replaceAll("\\<="," \\<< ");
+        preSourceCode=preSourceCode.replaceAll("\\>>"," \\>> ");
+        preSourceCode=preSourceCode.replaceAll("\\@"," \\@ ");
+        preSourceCode=preSourceCode.replaceAll("\\+ \\+"," ++");
 
         String[] preSourceCodeArray=preSourceCode.split(" ");
         //Mecanismo que permitirá guardar los tokens ignorando espacios en blanco
@@ -47,28 +96,11 @@ public class AnalisisLexico {
         automatas=new CreadorAutomatas();
 
     }
-    /**
-     * Método que permite validar los lexemas del código fuente en base
-     * a los autómatas del lenguajes. Si el token cumple con algún patrón
-     * será añadido a una tabla de tokens tokenList
-     * @return nada
-     */
-    public String validateLexemas(){
-        String validationMessage="IS_INVALIDO";
 
-        for(int i=0;i<sourceCode.size();i++){
-            if(validateToken(sourceCode.get(i).toString())){
-                tokenList.add(sourceCode.get(i).toString());
-            }else{
-                tokenList.add("Error Lexico");
-            }
-        }
-
-        return validationMessage;
-    }
     /**
      * Método que permite validar cada token individualmente
      * @return boolean si es válido el token
+     * obsoleto Ya se usó algo mejor
      */
     public boolean validateToken(String token){
         boolean isValid=false;
@@ -77,7 +109,6 @@ public class AnalisisLexico {
         //Mecanismo que revisa si el token es una palabra reservada
         for(int i=0;i<automatas.keyword.length;i++){
             for(Nodo j=automatas.keyword[i].states[0];j.nextArco.size()!=0;j=j.nextArco.get(0).nextNodo.get(0)){
-
                 isValid=pointer.equals(j.nextArco.get(0).letter);
                 if(!isValid){
                     pointerIndex=0;
@@ -88,6 +119,7 @@ public class AnalisisLexico {
                         if(pointerIndex<token.length()-1){
                             isValid=false;
                         }
+                        componenteLexico=automatas.keyword[i].componenteLexico;
                         return isValid;
                     }
                     pointerIndex++;
@@ -95,8 +127,133 @@ public class AnalisisLexico {
                 }
             }
         }
+        //Mecanismo que revisa si el token es un simbolo
         pointerIndex=0;
+        for(int i=0;i<automatas.symbols.length;i++){
+            for(Nodo j=automatas.symbols[i].states[0];j.nextArco.size()!=0;j=j.nextArco.get(0).nextNodo.get(0)){
+                isValid=pointer.equals(j.nextArco.get(0).letter);
+                if(!isValid){
+                    pointerIndex=0;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                    break;
+                }else{
+                    if(j.nextArco.get(0).nextNodo.get(0).isFinalState){
+                        if(pointerIndex<token.length()-1){
+                            isValid=false;
+                        }
+                        componenteLexico=automatas.symbols[i].componenteLexico;
+                        return isValid;
+                    }
+                    pointerIndex++;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                }
+            }
+        }
+        //Mecanismo que revisa si el token es operador relacional
+        pointerIndex=0;
+        for(int i=0;i<automatas.opRelational.length;i++){
+            for(Nodo j=automatas.opRelational[i].states[0];j.nextArco.size()!=0;j=j.nextArco.get(0).nextNodo.get(0)){
+                isValid=pointer.equals(j.nextArco.get(0).letter);
+                if(!isValid){
+                    pointerIndex=0;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                    break;
+                }else{
+                    if(j.nextArco.get(0).nextNodo.get(0).isFinalState){
+                        if(pointerIndex<token.length()-1){
+                            isValid=false;
+                        }
+                        componenteLexico=automatas.opRelational[i].componenteLexico;
+                        return isValid;
+                    }
+                    pointerIndex++;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                }
+            }
+        }
+        //Mecanismo que revisa si el token es coma
+        if(Pattern.compile(",").matcher(token).matches()){
+            componenteLexico="Comma";
+            return true;
+        }
+        //Mecanismo que revisa si el token es incremento
+        if(Pattern.compile("\\+\\+").matcher(token).matches()){
+            componenteLexico="incremento";
+            return true;
+        }
+
+        if(Pattern.compile("\\;\\;").matcher(token).matches()){
+            componenteLexico="decremento";
+            return true;
+        }
+
+        if(Pattern.compile("\\+\\=").matcher(token).matches()){
+            componenteLexico="Suma acumulada";
+            return true;
+        }
+
+        if(Pattern.compile("\\;\\=").matcher(token).matches()){
+            componenteLexico="Diferencia acumulada";
+            return true;
+        }
+
+        if(Pattern.compile("\\*\\=").matcher(token).matches()){
+            componenteLexico="Producto acumulado";
+            return true;
+        }
+
+        if(Pattern.compile("\\/\\=").matcher(token).matches()){
+            componenteLexico="Division acumulada";
+            return true;
+        }
+        //Mecanismo que revisa si el token es operador aritmetico
+        pointerIndex=0;
+        for(int i=0;i<automatas.opArithmetic.length;i++){
+            for(Nodo j=automatas.opArithmetic[i].states[0];j.nextArco.size()!=0;j=j.nextArco.get(0).nextNodo.get(0)){
+                isValid=pointer.equals(j.nextArco.get(0).letter);
+                if(!isValid){
+                    pointerIndex=0;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                    break;
+                }else{
+                    if(j.nextArco.get(0).nextNodo.get(0).isFinalState){
+                        if(pointerIndex<token.length()-1){
+                            isValid=false;
+                        }
+                        componenteLexico=automatas.opArithmetic[i].componenteLexico;
+                        return isValid;
+                    }
+                    pointerIndex++;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                }
+            }
+        }
+        //Mecanismo que revisa si el token es un operador logico
+        pointerIndex=0;
+        for(int i=0;i<automatas.opLogic.length;i++){
+            for(Nodo j=automatas.opLogic[i].states[0];j.nextArco.size()!=0;j=j.nextArco.get(0).nextNodo.get(0)){
+                isValid=pointer.equals(j.nextArco.get(0).letter);
+                if(!isValid){
+                    pointerIndex=0;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                    break;
+                }else{
+                    if(j.nextArco.get(0).nextNodo.get(0).isFinalState){
+                        if(pointerIndex<token.length()-1){
+                            isValid=false;
+                        }
+                        componenteLexico=automatas.opLogic[i].componenteLexico;
+                        return isValid;
+                    }
+                    pointerIndex++;
+                    pointer=token.substring(pointerIndex,pointerIndex+1);
+                }
+            }
+        }
+
         //Mecanismo que revisa si el token es un identificador
+        pointerIndex=0;
+        outer:
         for(Nodo i=automatas.identifier.states[0];pointerIndex<token.length();){
             for(int k=0;k<i.nextArco.size();k++){
                 pointer=token.substring(pointerIndex,pointerIndex+1);
@@ -104,7 +261,8 @@ public class AnalisisLexico {
                 if(!isValid){
                     if(pointerIndex==0 || k==i.nextArco.size()-1){
                         i=automatas.identifier.states[0];
-                        return false;
+                        isValid=false;
+                        break outer;
                     }
                 }else{
                     pointerIndex++;
@@ -114,17 +272,152 @@ public class AnalisisLexico {
                 }
             }
         }
+        if(isValid){
+            componenteLexico=automatas.identifier.componenteLexico  ;
+            return true;
+        }
+
+        //Mecanismo que revisa si el token es un numero
+        pointerIndex=0;
+        Nodo i=automatas.number.states[0];
+        for(;pointerIndex<token.length();){
+            for(int k=0;k<i.nextArco.size();k++){
+                pointer=token.substring(pointerIndex,pointerIndex+1);
+                isValid=pointer.equals(i.nextArco.get(k).letter);
+                if(isValid){
+                    pointerIndex++;
+                    i=i.nextArco.get(k).nextNodo.get(0);
+                    break;
+                }
+            }
+            if(!isValid){
+                break;
+            }
+        }
+        if(i.isFinalState){
+            componenteLexico=automatas.number.componenteLexico;
+            return true;
+        }
+
+        //Mecanismo que revisa si el token es cadena
+        pointerIndex=0;
+        i=automatas.string.states[0];
+        for(;pointerIndex<token.length();){
+            for(int k=0;k<i.nextArco.size();k++){
+                pointer=token.substring(pointerIndex,pointerIndex+1);
+                isValid=pointer.equals(i.nextArco.get(k).letter);
+                if(isValid){
+                    pointerIndex++;
+                    if(k==62){
+                        i=i.nextArco.get(k).nextNodo.get(1);
+                        break;
+                    }else{
+                        i=i.nextArco.get(k).nextNodo.get(0);
+                        break;
+                    }
+
+                }
+            }
+            if(!isValid){
+                break;
+            }
+        }
+        if(i.isFinalState){
+            componenteLexico=automatas.string.componenteLexico;
+            isValid=true;
+        }
+
         return isValid;
     }
     /**
-     * Método que permite imprimir la lista de tokens en consola
+     * Método que permite obtener la lista de tokens
+     * @return tokens
+     */
+    public String printValidTokens(){
+        String tokenInfo="";
+        for(int i=0;i<tokenList.size();i++){
+            tokenInfo+="Token: "+tokenList.get(i)[0]+"\n";
+            tokenInfo+="No linea: "+tokenList.get(i)[1]+"\n";
+            tokenInfo+= tokenList.get(i)[2]+"\n";
+            tokenInfo+="C. Lexico: "+tokenList.get(i)[3]+"\n";
+            tokenInfo+="___________________________"+"\n";
+        }
+        return tokenInfo;
+    }
+    /**
+     * Método que permite obtener la lista de tokens de error
+     * @return tokens
+     */
+    public String createErrorList(){
+        String tokenInfo="";
+        for(int i=0;i<tokenList.size();i++){
+            if(!tokenList.get(i)[2].equals("Valido")){
+                errorList.add(tokenList.get(i));
+            }
+        }
+        for(int i=0;i<errorList.size();i++){
+            tokenInfo+="Token: "+errorList.get(i)[0]+"\n";
+            tokenInfo+="No linea: "+errorList.get(i)[1]+"\n";
+            tokenInfo+="Error Léxico id: EL000001\n";
+            tokenInfo+="Secuencia de caracteres no válida\n";
+            tokenInfo+="Solución: Reescribir secuencia\n";
+            tokenInfo+="___________________________"+"\n";
+        }
+        return tokenInfo;
+    }
+    /**
+     * Método que permite obtener la lista de tokens de error
+     * @return tokens
+     */
+    public String createValidTokenList(){
+        String tokenInfo="";
+        for(int i=0;i<tokenList.size();i++){
+            if(tokenList.get(i)[2].equals("Valido")){
+                validTokenList.add(tokenList.get(i));
+            }
+        }
+        for(int i=0;i<validTokenList.size();i++){
+            tokenInfo+="Token: "+validTokenList.get(i)[0]+"\n";
+            tokenInfo+="No linea: "+validTokenList.get(i)[1]+"\n";
+            tokenInfo+="___________________________"+"\n";
+        }
+        return tokenInfo;
+    }
+    /**
+     * Método que permite Generar tokens sin asignar validad
      * @return nada
      */
-    public void printValidTokens(){
-        System.out.println("----------------------TOKENS-------------------------");
-        for(int i=0;i<tokenList.size();i++){
-            System.out.println(tokenList.get(i).toString());
+    public void generateTokens(){
+        String tokenGenerator="",elementTokenPointer="";
+        String[] tokenContent;
+        boolean firstLetterFound=false;
+
+        for(int i=0;i<sourceCodeSeparatedInLines.length;i++){
+            sourceCodeSeparatedInLines[i]+=" ";
+        }
+
+        for(int i=0;i<sourceCodeSeparatedInLines.length;i++){
+            for(int j=0;j<sourceCodeSeparatedInLines[i].length();j++){
+                elementTokenPointer=sourceCodeSeparatedInLines[i].substring(j,j+1);
+                if(!elementTokenPointer.equals(" ")){
+                    firstLetterFound=true;
+                    tokenGenerator+=elementTokenPointer;
+                }else{
+                    if(firstLetterFound){
+                        tokenContent=(tokenGenerator+"-"+(i+1)+"-ND-SC").split("-");
+                        if(validateToken(tokenGenerator)){
+                            tokenContent[2]="Valido";
+                            tokenContent[3]=componenteLexico;
+                        } else{
+                            tokenContent[2]="Error Léxico: Símbolo no válido";
+                            tokenContent[3]="id: EL000001";
+                        }
+                        firstLetterFound=false;
+                        tokenList.add(tokenContent);
+                        tokenGenerator="";
+                    }
+                }
+            }
         }
     }
-
 }

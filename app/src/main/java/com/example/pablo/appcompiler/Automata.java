@@ -18,8 +18,25 @@ public class Automata {
      * @return El autómata
      */
     public Automata(String automataData){
-        String[] automataStatesTransitions=automataData.split("-");
-        componenteLexico="No definido";
+        int ocurrencias=0,ultimaPos=0;
+        String pointer="";
+        String[] automataStatesTransitions;
+
+        ultimaPos=automataData.indexOf("-")+1;
+        ocurrencias++;
+        pointer=automataData.substring(ultimaPos);
+        if(pointer.indexOf("-")!=-1){
+            ocurrencias++;
+        }
+
+        if(ocurrencias>1){
+            automataStatesTransitions=automataData.split("#");
+            componenteLexico="No definido";
+        }else{
+            automataStatesTransitions=automataData.split("-");
+            componenteLexico="No definido";
+        }
+
         /*System.out.println("------------------------CREATE AUTOMATA------------------------------");
             ----CODIGO DE PRUEBA PARA VERIFICAR UN ERROR, YA HA SIDO CORREGIDO-----
         System.out.println("automataData= "+automataData);
@@ -28,8 +45,16 @@ public class Automata {
 
         String strAutomataStates=automataStatesTransitions[0];
         String strAutomataTransitions=automataStatesTransitions[1];
-        String[] automataStates=strAutomataStates.split(",");
-        String[] automataTransitions=strAutomataTransitions.split(",");
+        String[] automataStates;
+        String[] automataTransitions;
+        if(ocurrencias>1){
+            automataStates=strAutomataStates.split(":");
+            automataTransitions=strAutomataTransitions.split(":");
+        }else{
+            automataStates=strAutomataStates.split(",");
+            automataTransitions=strAutomataTransitions.split(",");
+        }
+
         /*System.out.println("-----------------------------------------------");
         for(int i=0;i<automataStates.length;i++){
             System.out.println("automataStates["+i+"]= "+automataStates[i]);
@@ -99,7 +124,7 @@ public class Automata {
     public void printAutomata(){
 
         for(int i=0;i<states.length;i++){
-            System.out.println("------------------------------------------------------");
+            System.out.println("---------------------"+componenteLexico+"---------------------------");
             System.out.println("State=> "+states[i].state);
             System.out.println("init?=> "+states[i].isInitState);
             System.out.println("final?=> "+states[i].isFinalState);

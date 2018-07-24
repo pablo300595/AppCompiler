@@ -12,7 +12,10 @@ import android.widget.Toast;
 public class EditorFragment extends Fragment{
     Button btnCompilar;
     EditText editCod;
+    static String tokenList,errorList,validTokenList;
     AnalisisLexico analizadorLexico;
+    AnalisisSintactico analizadorSintactico;
+    AnalisisSemantico analizadorSemantico;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -25,8 +28,17 @@ public class EditorFragment extends Fragment{
             public void onClick(View v) {
             //Evento de click a compilar que manda a procesar el texto escrito
             analizadorLexico=new AnalisisLexico(editCod.getText().toString());
-            analizadorLexico.validateLexemas();
-            analizadorLexico.printValidTokens();
+            analizadorLexico.generateTokens();
+            tokenList=analizadorLexico.printValidTokens();
+            errorList=analizadorLexico.createErrorList();
+            validTokenList=analizadorLexico.createValidTokenList();
+            analizadorSintactico=new AnalisisSintactico(analizadorLexico.validTokenList,analizadorLexico.automatas,analizadorLexico.errorList);
+            analizadorSemantico=new AnalisisSemantico(analizadorSintactico.errorList,analizadorSintactico.sentencias,analizadorSintactico.inicializaciones,analizadorSintactico.automatas);
+            SalidaFragment.tvTokens.setText(tokenList);
+            SalidaFragment.tvErrors.setText(errorList);
+            //System.out.println("_____________________________________________________________");
+            //System.out.println("VERIFICACION DE REGLA");
+            //System.out.println(analizadorSintactico.checkIfTokenFollowSequence("==(([0-9])+.([0-9])+)|([0-9])+$","==9.26"));
             }
         });
 

@@ -10,10 +10,10 @@ public class CodigoIntermedio{
     ArrayList<String[][]> temporales;
 
     //Arrays con ejemplos de lo que se recibirá de la fase de análisis
-    String sentencia[]= {"3", "int _a==20$", "inicialización"};
-    String sentencia1[]= {"3", "int _b==1$", "inicialización"};
+    String sentencia[]= {"3", "int _a$", "inicialización"};
+    String sentencia1[]= {"3", "int _b$", "inicialización"};
     String sentencia2[]= {"8", "_a==9$", "asignación"};
-    String sentencia3[]= {"8", "for(int _j==0;_j<10;_j++){\n" +
+    /*String sentencia3[]= {"8", "for(int _j==0;_j<10;_j++){\n" +
             "        _a== 5$\n"+
             "        _b== 2$\n"+
             "    }", "estructuraFor"};
@@ -26,7 +26,7 @@ public class CodigoIntermedio{
             "           _a== 15$\n"+
             "        }\n"+
             "    }", "estructuraIf"};
-    /*String sentencia5[]= {"8", "_a++$", "incremento"};
+    String sentencia5[]= {"8", "_a++$", "incremento"};
     String sentencia6[]= {"8", "_b;;$", "decremento"};
     String sentencia7[]= {"8", "_b+=25$", "suma con asignación"};
     String sentencia8[]= {"8", "_a;=25$", "resta con asignación"};
@@ -63,8 +63,8 @@ public class CodigoIntermedio{
         sentencias.add(sentencia);
         sentencias.add(sentencia1);
         sentencias.add(sentencia2);
-        sentencias.add(sentencia3);
-        sentencias.add(sentencia4);
+        //sentencias.add(sentencia3);
+        //sentencias.add(sentencia4);
         /*sentencias.add(sentencia5);
         sentencias.add(sentencia6);
         sentencias.add(sentencia7);
@@ -388,11 +388,6 @@ public class CodigoIntermedio{
     public static void main(String arg[]){
         CodigoIntermedio c= new CodigoIntermedio();
         c.generarCodigo();
-        //javax.swing.JOptionPane.showMessageDialog(null, c.codigoIntermedio);
         System.out.println(c.codigoIntermedio);
-        /*for(int i= 0;i<c.temporales.size();i++){
-            javax.swing.JOptionPane.showMessageDialog(null, c.temporales.get(i)[0][0]+", "+c.temporales.get(i)[0][1]);
-        }*/
-
     }
 }

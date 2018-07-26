@@ -10,33 +10,36 @@ public class CodigoIntermedio{
     ArrayList<String[][]> temporales;
 
     //Arrays con ejemplos de lo que se recibirá de la fase de análisis
-    String sentencia[]= {"3", "int _a==20$", "inicialización"};
-    String sentencia1[]= {"3", "int _b$", "inicialización"};
-    String sentencia2[]= {"8", "_a==9$", "asignación"};
-    /*String sentencia3[]= {"8", "for(int _j==0;_j<10;_j++){\n" +
-            "        _a== 5$\n"+
-            "        _b== 2$\n"+
-            "    }", "estructuraFor"};
-    String sentencia4[]= {"8", "if(_a==_b){\n" +
-            "        for(int _j==0;_j<10;_j++){\n" +
-            "           _a== 5$\n"+
-            "           _b== 2$\n"+
-            "        }\n"+
-            "        for(int _h==0;_h<10;_h++){\n" +
-            "           _a== 15$\n"+
-            "        }\n"+
-            "    }", "estructuraIf"};
-    String sentencia5[]= {"8", "_a++$", "incremento"};
-    String sentencia6[]= {"8", "_b;;$", "decremento"};
-    String sentencia7[]= {"8", "_b+=25$", "suma con asignación"};
-    String sentencia8[]= {"8", "_a;=25$", "resta con asignación"};
-    String sentencia9[]= {"8", "_b*=25$", "multiplicación con asignación"};
-    String sentencia10[]= {"8", "_a/=25$", "división con asignación"};
-    String sentencia11[]= {"8", "servo(_b,_a)$", "estructuraServo"};
-    String sentencia12[]= {"8", "solenoid(_b,_a)$", "estructuraSolenoid"};
-    String sentencia13[]= {"8", "light(_b,_a)$", "estructuraLight"};
-    String sentencia14[]= {"8", "display(_b,_a,8)$", "estructuraDisplay"};
-    String sentencia15[]= {"8", "sensor()$", "estructuraSensor"};*/
+    String sentencia[]= {"1", "int _tiempoMovimiento==20$", "inicialización"};
+    String sentencia1[]= {"1", "int _mostrarTemperatura==1$", "inicialización"};
+    String sentencia2[]= {"1", "float _centigrados$", "inicialización"};
+    String sentencia3[]= {"1", "int _foco1==0$", "inicialización"};
+    String sentencia4[]= {"1", "int _foco2==0$", "inicialización"};
+    String sentencia5[]= {"1", "int _servo1==0$", "inicialización"};
+    String sentencia6[]= {"1", "int _servo2==0$", "inicialización"};
+    String sentencia7[]= {"1", "int _solenoide==0$", "inicialización"};
+    String sentencia8[]= {"1", "int _gradosMinimo1==65$", "inicialización"};
+    String sentencia9[]= {"1", "int _gradosMaximo1==135$", "inicialización"};
+    String sentencia10[]= {"1", "int _gradosMinimo2==65$", "inicialización"};
+    String sentencia11[]= {"1", "int _gradosMaximo2==135$", "inicialización"};
+
+    String sentencia12[]= {"1", "if(_mostrarTemperatura==1){\n"+
+            "_centigrados==leerTemperatura()$\n"+
+            "display(0,0,'INCUBAMEX 2.0')$\n"+
+            "display(0,1,_centigrados)$\n"+
+            "display(6,1,'Grados')$\n"+
+            //"delay(1000)$\n"+
+            "}", "estructuraIf"};
+    String sentencia13[]= {"1", "if(_servo1==1){\n"+
+            "for(int _pos==_gradosMinimo1$_pos<=_gradosMaximo1$_pos++){\n"+
+            "servo(15,_pos)$\n"+
+            //"delay(_tiempoMovimiento)$\n"+
+            "}\n"+
+            "for(int _pos1==_gradosMaximo1$_pos1>=_gradosMinimo1$_pos1;;){\n"+
+            "servo(13,_pos1)$\n"+
+            //"delay(_tiempoMovimiento)$\n"+
+            "}\n"+
+            "}", "estructuraIf"};
 
     //Cadena para mostrar la conversión de código fuente a intermedio
     String codigoIntermedio;
@@ -47,7 +50,6 @@ public class CodigoIntermedio{
 
     //Contadores para los nombres de los temporales
     int contTempId;
-    int contTempKeyWord;
     int contTempServo;
     int contTempSolenoid;
     int contTempSensor;
@@ -63,7 +65,7 @@ public class CodigoIntermedio{
         sentencias.add(sentencia);
         sentencias.add(sentencia1);
         sentencias.add(sentencia2);
-        /*sentencias.add(sentencia3);
+        sentencias.add(sentencia3);
         sentencias.add(sentencia4);
         sentencias.add(sentencia5);
         sentencias.add(sentencia6);
@@ -74,8 +76,6 @@ public class CodigoIntermedio{
         sentencias.add(sentencia11);
         sentencias.add(sentencia12);
         sentencias.add(sentencia13);
-        sentencias.add(sentencia14);
-        sentencias.add(sentencia15);*/
 
         //Agregar todos los ArrayList de sentencias al ArrayList de llamadas
         calls.add(sentencias);
@@ -152,6 +152,7 @@ public class CodigoIntermedio{
                         boolean flag1= false;
                         for(int k= 1;k<arr1.length;k++){
                             if(arr1[k].contains("}")){
+
                                 casoFor(arrayList.get(cont));
                                 cont++;
                                 flag1= false;
@@ -165,6 +166,18 @@ public class CodigoIntermedio{
                                 continue;
                             }else if(arr1[k].contains("==")){
                                 casoAsignacion(arr1[k]);
+                            }else if(arr1[k].contains("display")){
+                                palabrasReservadas(arr1[k], "display", "dp"+contTempDisplay);
+                                contTempDisplay++;
+                            }else if(arr1[k].contains("servo")){
+                                palabrasReservadas(arr1[k], "servo", "sv"+contTempServo);
+                                contTempServo++;
+                            }else if(arr1[k].contains("solenoid")){
+                                palabrasReservadas(arr1[k], "solenoid", "sn"+contTempSolenoid);
+                                contTempSolenoid++;
+                            }else if(arr1[k].contains("light")){
+                                palabrasReservadas(arr1[k], "light", "lg"+contTempLight);
+                                contTempLight++;
                             }
                         }
                         codigoIntermedio+= "}\n";
@@ -231,7 +244,6 @@ public class CodigoIntermedio{
             auxTemp= auxTemp.substring(indexTemp+1, auxTemp.length()-1);
             //Agregar el nombre de id al ArrayList de temporales junto con su nombre de temporal
             temporales.add(new String[][]{{auxTemp, tempId+contTempId}});
-            System.out.println(auxTemp+"ñañaña");
 
             String aux= sentencia.replace("==", "=");
             int index= aux.indexOf("=");
@@ -249,12 +261,26 @@ public class CodigoIntermedio{
             int indexTemp= auxTemp.indexOf("#");
             int indexTemp1= auxTemp.indexOf("=");
             auxTemp= auxTemp.substring(indexTemp+1, indexTemp1);
+
             temporales.add(new String[][]{{auxTemp, tempId+contTempId}});
             //Se reemplaza el nombre del id por su nombre de temporal dentro de la cabecera del for
             cabeceraFor= cabeceraFor.replaceAll(auxTemp, tempId+contTempId);
             cabeceraFor= cabeceraFor.replace("==", "=");
             cabeceraFor= cabeceraFor.replace("int ", "");
-            String arr[]= cabeceraFor.split(";");
+
+            for(int k= 0;k<temporales.size();k++){
+                if(cabeceraFor.contains(temporales.get(k)[0][0])){
+                    System.out.println("ñañaña");
+                    cabeceraFor= cabeceraFor.replace(temporales.get(k)[0][0], temporales.get(k)[0][1]);
+                }
+            }
+
+            String arr[]= cabeceraFor.split("\\$");
+
+            /*for(int a= 0;a<temporales.size();a++){
+                System.out.println(temporales.get(a)[0][0]);
+            }*/
+
             for(int n= 0;n<arr.length-1;n++){
                 //Se agrega cabecera de for convertida a código intermedio
                 codigoIntermedio+= arr[n]+";";
@@ -279,7 +305,6 @@ public class CodigoIntermedio{
         while(sentencia.charAt(i)==' '){
             i++;
         }
-        //javax.swing.JOptionPane.showMessageDialog(null, sentencia);
         String aux= sentencia.substring(i, index);
         //Se recorre el ArrayList de temporales para encontrar el nombre de temporal de ese id
         String espacios= "";
@@ -303,12 +328,13 @@ public class CodigoIntermedio{
         //Se obtiene únicamente el nombre del id dentro de la sentencia
 
         int index1= sentencia.indexOf("(");
-        int index2= sentencia.indexOf(";");
+        int index2= sentencia.indexOf("$");
         String aux1= sentencia.substring(index1+1, index2);
 
         int index3= sentencia.indexOf("{")+1;
 
         casoInicializacion(aux1, sentencia.substring(0, index3));
+
         //Se separa cada sentencia dentro del for dentro de un arreglo
         String aux2= sentencia.substring(index3, sentencia.lastIndexOf("\n"));
 
@@ -319,9 +345,27 @@ public class CodigoIntermedio{
             if(arr[k].contains("}")){
                 continue;
             }
+            if(arr[k].contains("display")){
+                palabrasReservadas(arr[k], "display", "dp"+contTempDisplay);
+                contTempDisplay++;
+                continue;
+            }else if(arr[k].contains("servo")){
+                palabrasReservadas(arr[k], "servo", "sv"+contTempServo);
+                contTempServo++;
+                continue;
+            }else if(arr[k].contains("solenoid")){
+                palabrasReservadas(arr[k], "solenoid", "sn"+contTempSolenoid);
+                contTempSolenoid++;
+                continue;
+            }else if(arr[k].contains("light")){
+                palabrasReservadas(arr[k], "light", "lg"+contTempLight);
+                contTempLight++;
+                continue;
+            }
             espacios= casoAsignacion(arr[k]);
         }
-        codigoIntermedio+= espacios.substring(0, espacios.length()-4)+"}\n";
+
+        codigoIntermedio+= espacios.substring(0, espacios.length())+"          }\n";
     }
 
     public void incrementoDecremento(String sentencia, String signo){
@@ -362,6 +406,7 @@ public class CodigoIntermedio{
 
         if(keyWord.equals("display")){
             int index3= sentencia.lastIndexOf(",");
+            aux1= sentencia.substring(index3+1, index2);
             String aux2= sentencia.substring(index1+1, index3);
             buscarTempPorId(sentencia.substring(0, sentencia.length()-1)+";", aux, aux2, aux1);
         }else{
@@ -385,7 +430,7 @@ public class CodigoIntermedio{
 
     public void buscarTempPorId(String sentencia, String id, String id1, String id2){
         for(int k= 0;k<temporales.size();k++){
-            if(id.equals(temporales.get(k)[0][0]) || id1.equals(temporales.get(k)[0][0])){
+            if(id.equals(temporales.get(k)[0][0]) || id1.equals(temporales.get(k)[0][0]) || id2.equals(temporales.get(k)[0][0])){
                 if(id.equals(temporales.get(k)[0][0])){
                     sentencia= sentencia.replace(id, temporales.get(k)[0][1]);
                 }
@@ -393,7 +438,7 @@ public class CodigoIntermedio{
                     sentencia= sentencia.replace(id1, temporales.get(k)[0][1]);
                 }
                 if(id2.equals(temporales.get(k)[0][0])){
-                    sentencia= sentencia.replace(id1, temporales.get(k)[0][1]);
+                    sentencia= sentencia.replace(id2, temporales.get(k)[0][1]);
                 }
             }
         }

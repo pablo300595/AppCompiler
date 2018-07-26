@@ -10,7 +10,7 @@ public class CodigoIntermedio{
     ArrayList<String[][]> temporales;
 
     //Arrays con ejemplos de lo que se recibirá de la fase de análisis
-    String sentencia[]= {"3", "int _a$", "inicialización"};
+    String sentencia[]= {"3", "int _a==20$", "inicialización"};
     String sentencia1[]= {"3", "int _b$", "inicialización"};
     String sentencia2[]= {"8", "_a==9$", "asignación"};
     /*String sentencia3[]= {"8", "for(int _j==0;_j<10;_j++){\n" +
@@ -63,9 +63,9 @@ public class CodigoIntermedio{
         sentencias.add(sentencia);
         sentencias.add(sentencia1);
         sentencias.add(sentencia2);
-        //sentencias.add(sentencia3);
-        //sentencias.add(sentencia4);
-        /*sentencias.add(sentencia5);
+        /*sentencias.add(sentencia3);
+        sentencias.add(sentencia4);
+        sentencias.add(sentencia5);
         sentencias.add(sentencia6);
         sentencias.add(sentencia7);
         sentencias.add(sentencia8);
@@ -222,6 +222,21 @@ public class CodigoIntermedio{
             //Agregar a la cadena de código intermedio la conversión de la sentencia
             String aux1= tempId+contTempId+aux.substring(index)+"\n";
             aux1= aux1.replace("$", ";");
+            codigoIntermedio+= aux1;
+            contTempId++;
+        }else{
+            String auxTemp= sentencia.replace(" ", "#");
+            int indexTemp= auxTemp.indexOf("#");
+            //Obtener con substring únicamente el nombre de id
+            auxTemp= auxTemp.substring(indexTemp+1, auxTemp.length()-1);
+            //Agregar el nombre de id al ArrayList de temporales junto con su nombre de temporal
+            temporales.add(new String[][]{{auxTemp, tempId+contTempId}});
+            System.out.println(auxTemp+"ñañaña");
+
+            String aux= sentencia.replace("==", "=");
+            int index= aux.indexOf("=");
+            //Agregar a la cadena de código intermedio la conversión de la sentencia
+            String aux1= tempId+contTempId+";"+"\n";
             codigoIntermedio+= aux1;
             contTempId++;
         }
@@ -388,6 +403,11 @@ public class CodigoIntermedio{
     public static void main(String arg[]){
         CodigoIntermedio c= new CodigoIntermedio();
         c.generarCodigo();
+        //javax.swing.JOptionPane.showMessageDialog(null, c.codigoIntermedio);
         System.out.println(c.codigoIntermedio);
+        /*for(int i= 0;i<c.temporales.size();i++){
+            javax.swing.JOptionPane.showMessageDialog(null, c.temporales.get(i)[0][0]+", "+c.temporales.get(i)[0][1]);
+        }*/
+
     }
 }

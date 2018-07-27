@@ -16,6 +16,8 @@ public class EditorFragment extends Fragment{
     AnalisisLexico analizadorLexico;
     AnalisisSintactico analizadorSintactico;
     AnalisisSemantico analizadorSemantico;
+    CodigoIntermedio codigoIntermedio;
+    Optimizacion optimizacion;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class EditorFragment extends Fragment{
             errorList=analizadorSemantico.createErrorList();
             SalidaFragment.tvTokens.setText(tokenList);
             SalidaFragment.tvErrors.setText(errorList);
+            IntermedioFragment.cod.setText("hola");
             //System.out.println("_____________________________________________________________");
             //System.out.println("VERIFICACION DE REGLA");
             //System.out.println(analizadorSintactico.checkIfTokenFollowSequence("==(([0-9])+.([0-9])+)|([0-9])+$","==9.26"));

@@ -17,7 +17,12 @@ public class EditorFragment extends Fragment{
     AnalisisLexico analizadorLexico;
     AnalisisSintactico analizadorSintactico;
     AnalisisSemantico analizadorSemantico;
+
     EnviarMensaje EM;
+
+    CodigoIntermedio codigoIntermedio;
+    Optimizacion optimizacion;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,14 +36,15 @@ public class EditorFragment extends Fragment{
             @Override
             public void onClick(View v) {
             //Evento de click a compilar que manda a procesar el texto escrito
+
                 if(data.component.equals(editCod.getText().toString())){
                     analizadorLexico=new AnalisisLexico(editCod.getText().toString());
                     analizadorLexico.generateTokens();
                     tokenList=analizadorLexico.printValidTokens();
                     SalidaFragment.tvTokens.setText(tokenList);
                     SalidaFragment.tvErrors.setText("No hay error");
-                }else{
-                    analizadorLexico=new AnalisisLexico(editCod.getText().toString());
+                }
+                    /*analizadorLexico=new AnalisisLexico(editCod.getText().toString());
                     analizadorLexico.generateTokens();
                     analizadorLexico.createErrorList();
                     tokenList=analizadorLexico.printValidTokens();
@@ -48,15 +54,22 @@ public class EditorFragment extends Fragment{
                     errorList=analizadorSemantico.createErrorList();
                     tablaSimbolos=analizadorSemantico.getSymbolElements();
                     SalidaFragment.tvTokens.setText(tokenList);
-                    SalidaFragment.tvErrors.setText(errorList);
-                }
-                if(errorList.length()>0){
-                    
-                }
+                    SalidaFragment.tvErrors.setText(errorList);*/
 
-
-                //EM.enviarDatos(tablaSimbolos);
-
+            analizadorLexico=new AnalisisLexico(editCod.getText().toString());
+            analizadorLexico.generateTokens();
+            analizadorLexico.createErrorList();
+            tokenList=analizadorLexico.printValidTokens();
+            validTokenList=analizadorLexico.createValidTokenList();
+            analizadorSintactico=new AnalisisSintactico(analizadorLexico.validTokenList,analizadorLexico.automatas,analizadorLexico.errorList);
+            analizadorSemantico=new AnalisisSemantico(analizadorSintactico.errorList,analizadorSintactico.sentencias,analizadorSintactico.inicializaciones,analizadorSintactico.automatas);
+            errorList=analizadorSemantico.createErrorList();
+            SalidaFragment.tvTokens.setText(tokenList);
+            SalidaFragment.tvErrors.setText(errorList);
+            IntermedioFragment.cod.setText("hola");
+            //System.out.println("_____________________________________________________________");
+            //System.out.println("VERIFICACION DE REGLA");
+            //System.out.println(analizadorSintactico.checkIfTokenFollowSequence("==(([0-9])+.([0-9])+)|([0-9])+$","==9.26"));
             }
         });
 

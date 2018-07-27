@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    >
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Código intermedio"
+        android:textAlignment="center"
+        android:textSize="30dp"
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorBlack"
+        />
+
+    <TextView
+        android:id="@+id/editIntermedio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="intermedio"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorStrongGray"
+        android:textColor="@color/colorScarlet"
+        android:ems="14"
+        android:gravity="top"
+        />
+</LinearLayout>

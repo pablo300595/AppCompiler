@@ -20,6 +20,7 @@ public class AnalisisSintactico {
     String inicializacion0="int "+id+" == ("+num+") \\$ ";
     String inicializacion1="int "+id+" \\$ ";
     String inicializacion2="text "+id+" == ("+cad+") \\$ ";
+    String inicializacion3="int "+id+" == ("+cad+") \\$ ";
     String servo0="servo "+"\\( "+(id)+" , "+(id)+" \\) \\$ ";
     String servo1="servo "+"\\( "+(id)+" , "+(num)+" \\) \\$ ";
     String servo2="servo "+"\\( "+(num)+" , "+(id)+" \\) \\$ ";
@@ -71,17 +72,7 @@ public class AnalisisSintactico {
         }
     }
 
-    public boolean isId(String txt){;
-        return Pattern.compile("\\_([a-zA-Z0-9]){1,20}").matcher(txt).matches();
-    }
-
     public boolean checkIfTokenFollowSequence(String rule,String tokenContent){
-        /*   \\_([a-zA-Z0-9]){1,20}     */
-        //System.out.println("rule= "+rule);
-        //System.out.println("tokenContent= "+tokenContent);
-        //System.out.println("ValidoClasico-> "+Pattern.compile("==(([0-9])+.([0-9])+)|([0-9])+\\$").matcher(tokenContent).matches());
-        //System.out.println("ValidoRule-> "+Pattern.compile(rule).matcher(tokenContent).matches());
-
         return Pattern.compile(rule).matcher(tokenContent).matches();
     }
 
@@ -120,6 +111,7 @@ public class AnalisisSintactico {
                         index=posicionarIndiceTokenAultimaLinea(lastLineAnalyzed)+1;
                         cantOprSentencia=0;
                         sentencia="";
+                        tokensConsumidos++;
                     }else{
                         break;
                     }
@@ -128,14 +120,14 @@ public class AnalisisSintactico {
             if(cantOprSentencia==3){
                 if(Pattern.compile(asignacion1).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@asignacion ").split("@");
-                    inicializaciones.add(sent);
+                    sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
                     tokensConsumidos+=3;
                 }else if(Pattern.compile(inicializacion1).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@inicializacion ").split("@");
-                    inicializaciones.add(sent);
+                    sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
@@ -183,14 +175,21 @@ public class AnalisisSintactico {
             if(cantOprSentencia==5){
                 if(Pattern.compile(inicializacion0).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@inicializacion ").split("@");
-                    inicializaciones.add(sent);
+                    sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;
                     tokensConsumidos+=5;
                 }else if(Pattern.compile(inicializacion2).matcher(sentencia).matches()){
                     String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@inicializacion ").split("@");
-                    inicializaciones.add(sent);
+                    sentencias.add(sent);
+                    cantOprSentencia=0;
+                    sentencia="";
+                    foundAtLeastOne=true;
+                    tokensConsumidos+=5;
+                }else if(Pattern.compile(inicializacion3).matcher(sentencia).matches()){
+                    String[] sent=(tokenList.get(index)[1]+"@"+sentencia+"@inicializacion ").split("@");
+                    sentencias.add(sent);
                     cantOprSentencia=0;
                     sentencia="";
                     foundAtLeastOne=true;

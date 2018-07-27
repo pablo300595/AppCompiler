@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class AnalisisSemantico {
     ArrayList<String[]> errorList,sentencias,inicializaciones,tablaSimbolos;
     CreadorAutomatas automatas;
+    ArrayList<ArrayList<String []>> calls;
     int a=0;
 
     public AnalisisSemantico(ArrayList<String[]> errorList,ArrayList <String[]>sentencias,ArrayList<String[]> inicializaciones,CreadorAutomatas automatas){
@@ -21,14 +22,19 @@ public class AnalisisSemantico {
         initTablaSimbolos();
         validateDataType();
         a=10;
+
+        calls= new ArrayList<>();
+
     }
 
     public void initTablaSimbolos(){
         String[] content;
-        for(int i=0;i<inicializaciones.size();i++){
-            content=(inicializaciones.get(i)[0]+"-"+getType(inicializaciones.get(i)[1])+"-"+
-                    getId(inicializaciones.get(i)[1])+"-"+getValue(inicializaciones.get(i)[1])).split("-");
-            tablaSimbolos.add(content);
+        for(int i=0;i<sentencias.size();i++){
+            if(sentencias.get(i)[2].equals("inicializacion ")){
+                content=(sentencias.get(i)[0]+"-"+getType(sentencias.get(i)[1])+"-"+
+                        getId(sentencias.get(i)[1])+"-"+getValue(sentencias.get(i)[1])).split("-");
+                tablaSimbolos.add(content);
+            }
         }
     }
 
@@ -64,7 +70,8 @@ public class AnalisisSemantico {
         String value="";
         String[] sentenceElementPerElement=sentencia.split(" ");
         for(int i=0;i<sentenceElementPerElement.length;i++){
-            if(Pattern.compile("(([0-9])+.([0-9])+)|([0-9])+").matcher(sentenceElementPerElement[i]).matches()){
+            if(Pattern.compile("(([0-9])+.([0-9])+)|([0-9])+").matcher(sentenceElementPerElement[i]).matches()||
+                    Pattern.compile("'([a-zA-Z0-9])+'").matcher(sentenceElementPerElement[i]).matches()){
                 value=sentenceElementPerElement[i];
                 break;
             }
@@ -118,6 +125,11 @@ public class AnalisisSemantico {
             tokenInfo+="___________________________"+"\n";
         }
         return tokenInfo;
+    }
+
+    public void generateSourcreCode(){
+
+        calls.add(sentencias);
     }
 
 

@@ -50,6 +50,9 @@ public class EditorFragment extends Fragment{
                     SalidaFragment.tvTokens.setText(tokenList);
                     SalidaFragment.tvErrors.setText(errorList);
                 }
+                if(errorList.length()>0){
+                    
+                }
 
 
                 //EM.enviarDatos(tablaSimbolos);

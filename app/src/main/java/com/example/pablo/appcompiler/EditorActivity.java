@@ -27,9 +27,9 @@ public class EditorActivity extends AppCompatActivity {
         PagerAdapter pa=new PagerAdapter(getSupportFragmentManager());
         pa.addFragment(new EditorFragment(),"Editor");
         pa.addFragment(new SalidaFragment(),"Salida");
-        pa.addFragment(new SimbolosFragment(),"Tabla de símbolos");
-        pa.addFragment(new GeneralesFragment(),"Generales");
-        pa.addFragment(new ExtrasFragment(),"Extras");
+        pa.addFragment(new IntermedioFragment(),"Generales");
+        pa.addFragment(new OptimizacionFragment(),"Optimización");
+        pa.addFragment(new ObjetoFragment(),"Extras");
         vwpager.setAdapter(pa);
     }
 }

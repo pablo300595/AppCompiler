@@ -24,12 +24,10 @@ public class AnalisisSemantico {
     }
 
     public void initTablaSimbolos(){
-        String[] content=new String[4];
+        String[] content;
         for(int i=0;i<inicializaciones.size();i++){
-            content[0]=inicializaciones.get(i)[0];
-            content[1]=getType(inicializaciones.get(i)[1]);
-            content[2]=getId(inicializaciones.get(i)[1]);
-            content[3]=getValue(inicializaciones.get(i)[1]);
+            content=(inicializaciones.get(i)[0]+"-"+getType(inicializaciones.get(i)[1])+"-"+
+                    getId(inicializaciones.get(i)[1])+"-"+getValue(inicializaciones.get(i)[1])).split("-");
             tablaSimbolos.add(content);
         }
     }
@@ -80,7 +78,7 @@ public class AnalisisSemantico {
             if(tablaSimbolos.get(i)[1].equals("int")){
                 if(Pattern.compile("(([0-9])+.([0-9])+)").matcher(tablaSimbolos.get(i)[3]).matches()
                 || Pattern.compile("'([a-zA-Z0-9])+'").matcher(tablaSimbolos.get(i)[3]).matches()){
-                    error=("Tipos no compatibles "+"-Numero de linea "+tablaSimbolos.get(i)[0]+"-Error Semantico-Id ESE00004: Datos no compatibles").split("-");
+                    error=("Tipos no compatibles el valor "+tablaSimbolos.get(i)[3]+" no es entero para la variable "+tablaSimbolos.get(i)[2]+"-Numero de linea "+tablaSimbolos.get(i)[0]+"-Error Semantico-Id ESE00004: Datos no compatibles").split("-");
                     errorList.add(error);
                 }
             }
@@ -104,4 +102,23 @@ public class AnalisisSemantico {
         }
         return tokenInfo;
     }
+
+    /**
+     * Método que permite obtener los elementos de la tabla de simbolos
+     * @return tokens
+     */
+    public String getSymbolElements(){
+        String tokenInfo="";
+
+        for(int i=0;i<tablaSimbolos.size();i++){
+            tokenInfo+=tablaSimbolos.get(i)[0]+"\n";
+            tokenInfo+=tablaSimbolos.get(i)[1]+"\n";
+            tokenInfo+=tablaSimbolos.get(i)[2]+"\n";
+            tokenInfo+=tablaSimbolos.get(i)[3]+"\n";
+            tokenInfo+="___________________________"+"\n";
+        }
+        return tokenInfo;
+    }
+
+
 }

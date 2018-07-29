@@ -5,7 +5,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements EnviarMensaje {
 
     private TabLayout tblayout;
     private ViewPager vwpager;
@@ -31,5 +31,10 @@ public class EditorActivity extends AppCompatActivity {
         pa.addFragment(new GeneralesFragment(),"Generales");
         pa.addFragment(new ExtrasFragment(),"Extras");
         vwpager.setAdapter(pa);
+    }
+
+    @Override
+    public void enviarDatos(String mensaje){
+        //SimbolosFragment fragment = (SimbolosFragment) getFragmentManager().findFragmentById(R.id);
     }
 }
